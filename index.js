@@ -14,6 +14,24 @@ app.use(bodyParser.urlencoded({
 }));
 app.set("view engine", "ejs");
 
+mongoose.connect("mongodb://localhost:27017/Registration2", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
+mongoose.set('useCreateIndex', true);
+
+const UserSchema = new mongoose.Schema({
+  username:String,
+  name: String,
+  email: String,
+  password: String,
+});
+
+
+
+const User = new mongoose.model("User", UserSchema);
+
+
 
 app.get("/", function(req, res) {
 
@@ -29,6 +47,46 @@ app.get("/login",function(req,res){
 
 app.get("/register",function(req,res){
   res.render("register");
+});
+
+app.post("/register", function(req, res) {
+  var a = req.body.text;
+  var b = req.body.email;
+  var d = md5(req.body.password);
+  var e = req.body.cpassword;
+
+  //console.log(a + " " + b + " " + c + " " + d + " " + e + " " + f + " " + g);
+  function isEmpty(obj) {
+    for(var key in obj) {
+        if(obj.hasOwnProperty(key))
+            return false;
+    }
+    return true;
+}
+
+  User.find({
+    'email': b
+  }, function(err, users) {
+    if (err) {
+      console.log(err);
+      res.render("failure");
+    } else if(isEmpty(users))
+    {
+      const user = new User({
+        name: a,
+        email: b,
+        password: d,
+
+        username: b
+
+      });
+      user.save();
+      res.redirect("/login");
+    }
+    else
+    res.render("failure");
+  });
+
 });
 
 app.get("/ambulance", function(req,res){
@@ -53,6 +111,32 @@ app.post("/ambulance",function(req,res){
     //console.log(a);
     res.render("result",{hname: a});
 
+  });
+});
+
+app.post("/login", function(req, res) {
+  var x = req.body.userName;
+  var y = md5(req.body.password);
+  console.log(x + " " + y);
+
+  User.find({
+    'rollno': x
+  }, function(err, users) {
+    if (err) {
+      res.render("failure");
+
+      console.log(err);
+    } else
+    {
+      console.log(users[0]);
+      console.log(users);
+      if(y===users[0].password){
+        res.cookie("userid", x);
+      res.render("profile");
+      }
+      else
+      res.render("failure");
+    }
   });
 });
 
