@@ -90,26 +90,16 @@ app.post("/register", function(req, res) {
 });
 
 app.get("/ambulance", function(req,res){
-  res.render("home")
+  res.render("home");
 });
 
-var name;
-var a={};
+
 app.post("/ambulance",function(req,res){
   request("https://places.ls.hereapi.com/places/v1/discover/explore?at=19.1335144659%2C72.9092113631&cat=hospital-health-care-facility&apiKey=19Yzvz9O7CTVq1mf-B2ZzBuKz4Luu7coPP3N-Tdx5iA",function(error,response,body){
     var data=JSON.parse(body);
-    name=data.results.items;
-    //console.log(name);
-    for(var i=0;i<name.length;i=i+1)
-    {
-      // console.log(name[i]);
-      console.log(name[i].title);
-      console.log(name[i].position);
-      a[i]=(name[i].title);
-      //console.log(a[i]);
-    }
-    //console.log(a);
-    res.render("result",{hname: a});
+    var name=data.results.items;
+    console.log(name);
+    res.render("result");
 
   });
 });
